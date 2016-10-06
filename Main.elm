@@ -2,10 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (..)
-
-
---import Html.Attributes exposing (..)
-
+import Html.Attributes exposing (..)
 import Html.App as App
 import Http
 import Task
@@ -42,9 +39,9 @@ randomJoke =
 decoder : Decoder Response
 decoder =
     decode Response
-        |> required "id" int
-        |> required "joke" string
-        |> optional "categories" (list string) []
+        |> Json.Decode.Pipeline.required "id" int
+        |> Json.Decode.Pipeline.required "joke" string
+        |> optional "categories" (Json.Decode.list string) []
         |> at [ "value" ]
 
 
@@ -87,7 +84,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Joke response ->
-            ( toString response.id ++ " " ++ response.joke, Cmd.none )
+            ( response.joke, Cmd.none )
 
         Fail error ->
             ( toString error, Cmd.none )
@@ -102,9 +99,10 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [] [ text model ]
-        , button [ onClick GetJoke ] [ text "Get New Joke" ]
+    div [ class "scoreboard" ]
+        [ h2 [] [ text "Chuck Norris jokes generator" ]
+        , div [] [ button [ type' "button", onClick GetJoke ] [ text "Get New Joke" ] ]
+        , p [] [ text model ]
         ]
 
 
